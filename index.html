@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta
+    name="description"
+    content="Capturador de fotos com filtros, identificação e data usando Canvas."
+  >
+
+  <title>Camera PFE | Capturador inteligente</title>
+
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+
+<body>
+  <header class="topbar">
+    <a class="brand" href="#inicio" aria-label="Camera PFE - início">
+      <span class="brand-icon" aria-hidden="true">◉</span>
+      <span>Camera<span class="brand-accent">PFE</span></span>
+    </a>
+
+    <span class="topbar-label">Programação Front-End</span>
+  </header>
+
+  <main id="inicio" class="page-shell">
+
+    <section class="intro">
+      <p class="eyebrow">CÂMERA · CANVAS · MEDIADEVICES</p>
+
+      <h1>
+        Uma captura.<br>
+        <span>Com sua identidade.</span>
+      </h1>
+
+      <p class="intro-copy">
+        Faça uma foto, aplique um filtro e registre seu nome
+        e o momento da captura diretamente na imagem.
+      </p>
+    </section>
+
+    <section class="workspace" aria-label="Capturador de fotos">
+
+      <div class="camera-panel panel">
+
+        <div class="panel-heading">
+          <div>
+            <p class="section-kicker">01 / VISUALIZAÇÃO</p>
+            <h2>Visão da câmera</h2>
+          </div>
+
+          <span id="cameraStatus" class="status status-off">
+            <span class="status-dot"></span>
+            Câmera desligada
+          </span>
+        </div>
+
+        <div class="viewfinder" id="viewfinder">
+
+          <video
+            id="cameraVideo"
+            autoplay
+            playsinline
+            muted
+            aria-label="Imagem da câmera em tempo real"
+            hidden
+          ></video>
+
+          <div id="cameraPlaceholder" class="camera-placeholder">
+            <div class="camera-glyph" aria-hidden="true">📷</div>
+
+            <p class="placeholder-title">
+              Sua câmera está aguardando
+            </p>
+
+            <p class="placeholder-copy">
+              Ligue a câmera para começar a capturar.
+            </p>
+          </div>
+
+          <div class="viewfinder-tag">
+            <span class="record-dot"></span>
+            PRÉ-VISUALIZAÇÃO
+          </div>
+        </div>
+
+        <div class="camera-actions">
+          <button
+            id="toggleCameraButton"
+            class="button button-primary"
+            type="button"
+          >
+            <span aria-hidden="true">⏻</span>
+            Ligar câmera
+          </button>
+
+          <button
+            id="captureButton"
+            class="button button-light"
+            type="button"
+            disabled
+          >
+            <span aria-hidden="true">◎</span>
+            Capturar foto
+          </button>
+        </div>
+
+        <p
+          id="cameraMessage"
+          class="message"
+          role="status"
+          aria-live="polite"
+        >
+          Para começar, permita o acesso à câmera quando o navegador solicitar.
+        </p>
+      </div>
+
+      <aside class="settings-panel panel">
+
+        <p class="section-kicker">02 / PERSONALIZAÇÃO</p>
+        <h2>Identificação</h2>
+
+        <label class="field-label" for="studentName">
+          Nome do aluno
+        </label>
+
+        <input
+          id="studentName"
+          name="studentName"
+          type="text"
+          maxlength="70"
+          placeholder="Digite seu nome"
+          autocomplete="name"
+          required
+        >
+
+        <p class="field-help">
+          O nome ficará gravado na parte inferior da foto.
+        </p>
+
+        <label class="field-label" for="photoFilter">
+          Filtro da foto
+        </label>
+
+        <select id="photoFilter" name="photoFilter">
+          <option value="amber">Âmbar (sépia)</option>
+          <option value="grayscale">Preto e branco</option>
+          <option value="invert">Cores invertidas</option>
+          <option value="vintage">Vintage</option>
+          <option value="original">Original (sem filtro)</option>
+        </select>
+
+        <p class="field-help filter-help">
+          Escolha um filtro antes ou depois da captura.
+          A foto será atualizada automaticamente.
+        </p>
+
+        <div class="filter-preview">
+          <div
+            class="filter-preview-art"
+            id="filterPreviewArt"
+            aria-hidden="true"
+          >
+            <span>Aa</span>
+            <span class="preview-spark">✦</span>
+          </div>
+
+          <div>
+            <span class="filter-label">FILTRO SELECIONADO</span>
+
+            <strong id="filterTitle">Âmbar</strong>
+
+            <p id="filterDescription">
+              Sépia + contraste suave
+            </p>
+          </div>
+        </div>
+
+        <div class="privacy-note">
+          <span class="privacy-icon" aria-hidden="true">⌁</span>
+
+          <p>
+            <strong>Processamento local</strong><br>
+            A foto é processada no navegador e não é enviada a um servidor.
+          </p>
+        </div>
+
+      </aside>
+    </section>
+
+    <section
+      class="result-panel panel"
+      aria-labelledby="resultTitle"
+    >
+      <div class="result-heading">
+
+        <div>
+          <p class="section-kicker">03 / RESULTADO</p>
+          <h2 id="resultTitle">Sua foto processada</h2>
+        </div>
+
+        <button
+          id="downloadButton"
+          class="button button-outline"
+          type="button"
+          disabled
+        >
+          ↓ Baixar PNG
+        </button>
+      </div>
+
+      <div id="resultEmpty" class="result-empty">
+        <span class="result-empty-icon" aria-hidden="true">▧</span>
+
+        <p>A imagem final aparecerá aqui.</p>
+
+        <span>
+          O filtro, o nome e a data/hora serão incorporados à foto.
+        </span>
+      </div>
+
+      <figure id="resultFigure" class="result-figure" hidden>
+        <img
+          id="capturedImage"
+          alt="Foto capturada com filtro e identificação do aluno"
+        >
+
+        <figcaption id="captureCaption">
+          Captura processada com sucesso.
+        </figcaption>
+      </figure>
+    </section>
+
+    <footer class="footer">
+      <span>Camera PFE</span>
+
+      <span>
+        MediaDevices API
+        <i>·</i>
+        Canvas API
+        <i>·</i>
+        JavaScript
+      </span>
+    </footer>
+
+  </main>
+</body>
+</html>
